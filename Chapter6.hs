@@ -11,4 +11,4 @@ chk f a b = f a == b
 -- chk = (.) (==)
 
 arith :: Num b => (a -> b) -> Integer -> a -> b
-arith f _ a = f a
+arith f n a = f a + fromInteger n
