@@ -34,6 +34,10 @@ wordNumber :: Int -> String
 wordNumber = concat . intersperse "-" . map digitToWord . digits
 
 main :: IO ()
-main = f 12324546 -- putStrLn (wordNumber 12324546)
+main = do
+    f 12324546
+    f 100500
+    f 0
+    f 1
   where
-    f n = print n >> putStrLn (wordNumber n)
+    f n = putStr "> " >> print n >> putStrLn (wordNumber n)
