@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wall -Werror #-}
 module Chapter6 where
 
 -- https://www.reddit.com/r/HaskellBook/comments/79a3su/ch_6_on_a_scale_of_1_to_stupid/
