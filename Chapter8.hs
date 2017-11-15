@@ -2,6 +2,12 @@
 module Chapter8 where
 
 import Data.List (intersperse)
+import Debug.Trace (trace)
+
+mc91 :: (Num a, Ord a, Show a) => a -> a
+mc91 n | trace ("mc91 " ++ show n) False = undefined
+       | n > 100 = n - 10
+       | otherwise = mc91 . mc91 $ n + 11
 
 digitToWord :: Int -> String
 digitToWord d = case d of
