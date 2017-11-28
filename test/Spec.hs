@@ -1,3 +1,4 @@
+import Cipher (alphabet, decode, encode)
 import Chapter11
   ( BinaryTree(Leaf,Node)
   , foldTree
@@ -9,10 +10,13 @@ import Chapter11
   )
 
 import Test.Tasty (TestTree, defaultMain, testGroup)
-import Test.Tasty.HUnit ((@?=), Assertion, testCase)
+import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
 
 tests :: TestTree
-tests = testGroup "Unit tests" [ testCase "Chapter 11" testCh11 ]
+tests = testGroup "Unit tests"
+  [ testCase "Chapter 11" testCh11
+  , testCase "Cipher" testCipher
+  ]
 
 testCh11 :: Assertion
 testCh11 = do
@@ -31,6 +35,10 @@ testCh11 = do
         t3 = let i = insert' in i 10 $ i 0 $ i 2 $ i 4 $ i 6 Leaf
     foldTree (+) 0 t3 @?= 22
     foldTree (:) [] t3 @?= [0, 2, 4, 6, 10]
+
+testCipher :: Assertion
+testCipher = assertBool "codec" $ and [ decode (encode p k) k == p
+                                      | p <- alphabet, k <- alphabet ]
 
 main :: IO ()
 main = defaultMain tests
