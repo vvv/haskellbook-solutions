@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall -Werror #-}
-module Chapter8 where
+module Chapter08 where
 
 import Data.List (intersperse)
 import Debug.Trace (trace)

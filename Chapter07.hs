@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall -Werror #-}
-module Chapter7 where
+module Chapter07 where
 
 tensDigit :: Integral a => a -> a
 tensDigit x = x `div` 10 `mod` 10

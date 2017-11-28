@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall -Werror #-}
-module Chapter9 where
+module Chapter09 where
 
 eftBool :: Bool -> Bool -> [Bool]
 eftBool True False = []
