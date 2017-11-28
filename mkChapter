@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -eu -o pipefail
+
+usage() {
+    cat <<EOF
+Usage: ${0##*/} NUM
+Creates source file for chapter NUM. Does nothing if the file exists.
+EOF
+}
+
+(($# == 1)) || { usage >&2; exit 1; }
+case $1 in
+    help|--help|-h) usage; exit;;
+esac
+
+name=$(printf 'Chapter%02d.hs' $1)
+if [[ -e $name ]]; then
+    echo $name exists >&2
+    exit 1
+fi
+{
+    cat <<EOF
+{-# OPTIONS_GHC -Wall -Werror #-}
+module ${name%.hs} where
+
+EOF
+} >$name
