@@ -27,6 +27,7 @@ library
                      , Chapter10
                      , Chapter11
                      , Cipher
+                     , DaPhone
   build-depends:       base >= 4.7 && < 5
   default-language:    Haskell2010
   ghc-options:         -Wall -Werror
