@@ -33,6 +33,10 @@ reverseTaps (DaPhone keys) c = concat . catMaybes $ map taps keys
 cellPhonesDead :: DaPhone -> String -> [(Digit, Presses)]
 cellPhonesDead phone = concatMap (reverseTaps phone)
 
+-- | Count presses.
+--
+-- >>> fingerTaps [('a', 1)]
+-- 1
 fingerTaps :: [(Digit, Presses)] -> Presses
 fingerTaps = foldl' (flip $ (+) . snd) 0
 
