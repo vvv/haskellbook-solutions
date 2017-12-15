@@ -8,12 +8,30 @@ import Chapter11
   , postorder
   , preorder
   )
+import Chapter15 (XOR(..))
+
+import Data.Monoid ((<>))
 
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
+import Test.Tasty.SmallCheck (testProperty)
 
 tests :: TestTree
-tests = testGroup "Unit tests"
+tests = testGroup "Tests" [properties, unitTests]
+
+properties :: TestTree
+properties = testGroup "Properties" [scProps]
+
+scProps :: TestTree
+scProps = testGroup "Monoidal laws for XOR"
+  [ testProperty "mempty <> x == x" $ \x -> (mempty :: XOR) <> x == x
+  , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: XOR) == x
+  , testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
+        (x <> y) <> z == (x :: XOR) <> (y <> z)
+  ]
+
+unitTests :: TestTree
+unitTests = testGroup "Unit tests"
   [ testCase "Chapter 11" testCh11
   , testCase "Cipher" testCipher
   ]
