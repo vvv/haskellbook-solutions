@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall -Werror #-}
 module Chapter08 where
 
 import Data.List (intersperse)

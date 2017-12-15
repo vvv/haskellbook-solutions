@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall -Werror #-}
 module Chapter11 where
 
 data BinaryTree a =

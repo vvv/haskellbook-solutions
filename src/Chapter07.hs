@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall -Werror #-}
 module Chapter07 where
 
 tensDigit :: Integral a => a -> a

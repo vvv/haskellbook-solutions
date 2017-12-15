@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall -Werror #-}
 module Chapter10 where
 
 showFolds :: (String, String)

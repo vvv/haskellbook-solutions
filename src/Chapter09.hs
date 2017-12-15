@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wall -Werror #-}
 module Chapter09 where
 
 eftBool :: Bool -> Bool -> [Bool]
