@@ -1,3 +1,6 @@
+{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
+{-# OPTIONS_GHC -fno-warn-orphans #-}
+
 import Cipher (alphabet, decode, encode)
 import Chapter11
   ( BinaryTree(Leaf,Node)
@@ -8,13 +11,14 @@ import Chapter11
   , postorder
   , preorder
   )
-import Chapter15 (XOR(..))
+import Chapter15 (Optional(Nada,Only), XOR(..))
 
-import Data.Monoid ((<>))
+import Data.Monoid ((<>), Product(..), Sum(..))
 
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
 import Test.Tasty.SmallCheck (testProperty)
+import Test.SmallCheck.Series ((\/), Serial, cons0, cons1, newtypeCons, series)
 
 tests :: TestTree
 tests = testGroup "Tests" [properties, unitTests]
@@ -22,17 +26,37 @@ tests = testGroup "Tests" [properties, unitTests]
 properties :: TestTree
 properties = testGroup "Properties" [scProps]
 
+instance Serial m a => Serial m (Optional a) where
+    series = cons0 Nada \/ cons1 Only
+
+instance Monad m => Serial m XOR where
+    series = newtypeCons XOR
+
+type Opt = Optional (Sum Int)
+
+instance Serial m a => Serial m (Sum a) where
+    series = newtypeCons Sum
+
 scProps :: TestTree
-scProps = testGroup "Monoidal laws for XOR"
-  [ testProperty "mempty <> x == x" $ \x -> (mempty :: XOR) <> x == x
-  , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: XOR) == x
-  , testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
-        (x <> y) <> z == (x :: XOR) <> (y <> z)
+scProps = testGroup "SmallCheck properties"
+  [ testGroup "Monoidal laws for Optional"
+    [ testProperty "mempty <> x == x" $ \x -> (mempty :: Opt) <> x == x
+    , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: Opt) == x
+    , testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
+            (x <> y) <> z == (x :: Opt) <> (y <> z)
+    ]
+  , testGroup "Monoidal laws for XOR"
+    [ testProperty "mempty <> x == x" $ \x -> (mempty :: XOR) <> x == x
+    , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: XOR) == x
+    , testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
+            (x <> y) <> z == (x :: XOR) <> (y <> z)
+    ]
   ]
 
 unitTests :: TestTree
 unitTests = testGroup "Unit tests"
   [ testCase "Chapter 11" testCh11
+  , testCase "Chapter 15" testCh15
   , testCase "Cipher" testCipher
   ]
 
@@ -53,6 +77,13 @@ testCh11 = do
         t3 = let i = insert' in i 10 $ i 0 $ i 2 $ i 4 $ i 6 Leaf
     foldTree (+) 0 t3 @?= 22
     foldTree (:) [] t3 @?= [0, 2, 4, 6, 10]
+
+testCh15 :: Assertion
+testCh15 = do
+    Only (Sum (1 :: Int)) <> Only (Sum 1) @?= Only (Sum 2)
+    Only (Product (4 :: Int)) <> Only (Product 2) @?= Only (Product 8)
+    Only (Sum (1 :: Int)) <> Nada @?= Only (Sum 1)
+    Nada <> Only [1 :: Int] @?= Only [1]
 
 testCipher :: Assertion
 testCipher = assertBool "codec" $ and [ decode (encode p k) k == p

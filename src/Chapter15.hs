@@ -1,16 +1,22 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
-
 module Chapter15
-  ( XOR(..)
+  ( Optional(Nada,Only)
+  , XOR(..)
   ) where
 
-import Test.SmallCheck.Series (Serial, newtypeCons, series)
+data Optional a
+  = Nada
+  | Only a
+  deriving (Eq, Show)
+
+instance Monoid a => Monoid (Optional a) where
+    mempty = Nada
+
+    mappend Nada x = x
+    mappend x Nada = x
+    mappend (Only a) (Only b) = Only (mappend a b)
 
 newtype XOR = XOR Bool
   deriving (Eq, Show)
-
-instance Monad m => Serial m XOR where
-    series = newtypeCons XOR
 
 xor :: Bool -> Bool -> Bool
 xor = (/=)
