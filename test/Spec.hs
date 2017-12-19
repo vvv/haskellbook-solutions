@@ -1,5 +1,4 @@
 {-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
-{-# OPTIONS_GHC -fno-warn-orphans #-}
 
 import Cipher (alphabet, decode, encode)
 import Chapter11
@@ -18,7 +17,7 @@ import Data.Monoid ((<>), Product(..), Sum(..))
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
 import Test.Tasty.SmallCheck (testProperty)
-import Test.SmallCheck.Series ((\/), Serial, cons0, cons1, newtypeCons, series)
+import Test.SmallCheck.Series (Serial, newtypeCons, series)
 
 tests :: TestTree
 tests = testGroup "Tests" [properties, unitTests]
@@ -26,24 +25,25 @@ tests = testGroup "Tests" [properties, unitTests]
 properties :: TestTree
 properties = testGroup "Properties" [scProps]
 
-instance Serial m a => Serial m (Optional a) where
-    series = cons0 Nada \/ cons1 Only
+newtype Sum' a = Sum' a
+  deriving (Eq, Show)
 
-instance Monad m => Serial m XOR where
-    series = newtypeCons XOR
+instance Num a => Monoid (Sum' a) where
+    mempty = Sum' 0
+    mappend (Sum' x) (Sum' y) = Sum' (x + y)
 
-type Opt = Optional (Sum Int)
+instance Serial m a => Serial m (Sum' a) where
+    series = newtypeCons Sum'
 
-instance Serial m a => Serial m (Sum a) where
-    series = newtypeCons Sum
+type OptSum = Optional (Sum' Int)
 
 scProps :: TestTree
 scProps = testGroup "SmallCheck properties"
   [ testGroup "Monoidal laws for Optional"
-    [ testProperty "mempty <> x == x" $ \x -> (mempty :: Opt) <> x == x
-    , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: Opt) == x
+    [ testProperty "mempty <> x == x" $ \x -> (mempty :: OptSum) <> x == x
+    , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: OptSum) == x
     , testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
-            (x <> y) <> z == (x :: Opt) <> (y <> z)
+            (x <> y) <> z == (x :: OptSum) <> (y <> z)
     ]
   , testGroup "Monoidal laws for XOR"
     [ testProperty "mempty <> x == x" $ \x -> (mempty :: XOR) <> x == x
