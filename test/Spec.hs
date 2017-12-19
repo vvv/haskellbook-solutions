@@ -16,14 +16,35 @@ import Data.Monoid ((<>), Product(..), Sum(..))
 
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
-import Test.Tasty.SmallCheck (testProperty)
-import Test.SmallCheck.Series (Serial, newtypeCons, series)
+import qualified Test.Tasty.QuickCheck as QC (testProperty)
+import qualified Test.Tasty.SmallCheck as SC (testProperty)
+import Test.SmallCheck.Series (Serial(series), newtypeCons)
 
 tests :: TestTree
 tests = testGroup "Tests" [properties, unitTests]
 
 properties :: TestTree
-properties = testGroup "Properties" [scProps]
+properties = testGroup "Properties" [qcProps, scProps]
+
+monoidIdentityL :: (Eq t, Monoid t) => t -> Bool
+monoidIdentityL x = mempty <> x == x
+
+monoidIdentityR :: (Eq t, Monoid t) => t -> Bool
+monoidIdentityR x = x <> mempty == x
+
+monoidAssoc :: (Eq t, Monoid t) => t -> t -> t -> Bool
+monoidAssoc x y z = x <> (y <> z) == (x <> y) <> z
+
+type S = Optional (Sum Int)
+
+qcProps :: TestTree
+qcProps = testGroup "(checked with QuickCheck)"
+  [ testGroup "Monoidal laws for Optional"
+    [ QC.testProperty "mempty <> x == x" (monoidIdentityL :: S -> Bool)
+    , QC.testProperty "x <> mempty == x" (monoidIdentityR :: S -> Bool)
+    , QC.testProperty "Associativity" (monoidAssoc :: S -> S -> S -> Bool)
+    ]
+  ]
 
 newtype Sum' a = Sum' a
   deriving (Eq, Show)
@@ -35,21 +56,20 @@ instance Num a => Monoid (Sum' a) where
 instance Serial m a => Serial m (Sum' a) where
     series = newtypeCons Sum'
 
-type OptSum = Optional (Sum' Int)
+type S' = Optional (Sum' Int)
 
 scProps :: TestTree
-scProps = testGroup "SmallCheck properties"
+scProps = testGroup "(checked with SmallCheck)"
   [ testGroup "Monoidal laws for Optional"
-    [ testProperty "mempty <> x == x" $ \x -> (mempty :: OptSum) <> x == x
-    , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: OptSum) == x
-    , testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
-            (x <> y) <> z == (x :: OptSum) <> (y <> z)
+    [ SC.testProperty "mempty <> x == x" (monoidIdentityL :: S' -> Bool)
+    , SC.testProperty "x <> mempty == x" (monoidIdentityR :: S' -> Bool)
+    , SC.testProperty "Associativity" (monoidAssoc :: S' -> S' -> S' -> Bool)
     ]
   , testGroup "Monoidal laws for XOR"
-    [ testProperty "mempty <> x == x" $ \x -> (mempty :: XOR) <> x == x
-    , testProperty "x <> mempty == x" $ \x -> x <> (mempty :: XOR) == x
-    , testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
-            (x <> y) <> z == (x :: XOR) <> (y <> z)
+    [ SC.testProperty "mempty <> x == x" $ \x -> (mempty :: XOR) <> x == x
+    , SC.testProperty "x <> mempty == x" $ \x -> x <> (mempty :: XOR) == x
+    , SC.testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
+        (x <> y) <> z == (x :: XOR) <> (y <> z)
     ]
   ]
 
