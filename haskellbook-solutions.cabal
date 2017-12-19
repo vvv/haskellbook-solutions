@@ -35,13 +35,12 @@ library
   default-language:    Haskell2010
   ghc-options:         -Wall -Werror
 
-test-suite haskellbook-solutions-unittest
+test-suite haskellbook-solutions-tests
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
   build-depends:       base
                      , haskellbook-solutions
-                     , smallcheck
                      , tasty
                      , tasty-hunit
                      , tasty-quickcheck

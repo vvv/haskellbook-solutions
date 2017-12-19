@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances, MultiParamTypeClasses #-}
-
 import Cipher (alphabet, decode, encode)
 import Chapter11
   ( BinaryTree(Leaf,Node)
@@ -18,7 +16,6 @@ import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
 import qualified Test.Tasty.QuickCheck as QC (testProperty)
 import qualified Test.Tasty.SmallCheck as SC (testProperty)
-import Test.SmallCheck.Series (Serial(series), newtypeCons)
 
 tests :: TestTree
 tests = testGroup "Tests" [properties, unitTests]
@@ -46,26 +43,9 @@ qcProps = testGroup "(checked with QuickCheck)"
     ]
   ]
 
-newtype Sum' a = Sum' a
-  deriving (Eq, Show)
-
-instance Num a => Monoid (Sum' a) where
-    mempty = Sum' 0
-    mappend (Sum' x) (Sum' y) = Sum' (x + y)
-
-instance Serial m a => Serial m (Sum' a) where
-    series = newtypeCons Sum'
-
-type S' = Optional (Sum' Int)
-
 scProps :: TestTree
 scProps = testGroup "(checked with SmallCheck)"
-  [ testGroup "Monoidal laws for Optional"
-    [ SC.testProperty "mempty <> x == x" (monoidIdentityL :: S' -> Bool)
-    , SC.testProperty "x <> mempty == x" (monoidIdentityR :: S' -> Bool)
-    , SC.testProperty "Associativity" (monoidAssoc :: S' -> S' -> S' -> Bool)
-    ]
-  , testGroup "Monoidal laws for XOR"
+  [ testGroup "Monoidal laws for XOR"
     [ SC.testProperty "mempty <> x == x" $ \x -> (mempty :: XOR) <> x == x
     , SC.testProperty "x <> mempty == x" $ \x -> x <> (mempty :: XOR) == x
     , SC.testProperty "(x <> y) <> z == x <> (y <> z)" $ \x y z ->
