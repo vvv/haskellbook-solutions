@@ -14,7 +14,6 @@ import Data.Monoid ((<>), Product(..), Sum(..))
 import           Data.Semigroup (Semigroup)
 import qualified Data.Semigroup as S ((<>))
 
-import Test.QuickCheck.Function (Fun, apply)
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
 import qualified Test.Tasty.QuickCheck as QC (testProperty)
@@ -55,10 +54,6 @@ qcProps = testGroup "(checked with QuickCheck)"
         y = Combine $ \n -> Sum (n + 2)
         z = Combine $ \n -> Sum (n * 3)
     in QC.testProperty "Semigroup law for Combine" (semigroupAssoc x y z)
-  , let prop_composition :: Fun Int Int -> Fun Int Int -> Int -> Bool
-        prop_composition f g x =
-            ((apply f) . (apply g)) x == (apply f) ((apply g) x)
-    in QC.testProperty "XXX" prop_composition
   ]
 
 scProps :: TestTree
