@@ -8,9 +8,11 @@ import Chapter11
   , postorder
   , preorder
   )
-import Chapter15 (Optional(Nada,Only), XOR(..))
+import Chapter15 (Combine(..), Optional(Nada,Only), XOR(..))
 
 import Data.Monoid ((<>), Product(..), Sum(..))
+import           Data.Semigroup (Semigroup)
+import qualified Data.Semigroup as S ((<>))
 
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
@@ -32,6 +34,12 @@ monoidIdentityR x = x <> mempty == x
 monoidAssoc :: (Eq t, Monoid t) => t -> t -> t -> Bool
 monoidAssoc x y z = x <> (y <> z) == (x <> y) <> z
 
+semigroupAssoc :: (Eq b, Semigroup b)
+               => Combine a b -> Combine a b -> Combine a b -> a -> Bool
+semigroupAssoc x y z a = (x S.<> (y S.<> z)) ==? ((x S.<> y) S.<> z)
+  where
+    f ==? g = unCombine f a == unCombine g a
+
 type S = Optional (Sum Int)
 
 qcProps :: TestTree
@@ -41,6 +49,11 @@ qcProps = testGroup "(checked with QuickCheck)"
     , QC.testProperty "x <> mempty == x" (monoidIdentityR :: S -> Bool)
     , QC.testProperty "Associativity" (monoidAssoc :: S -> S -> S -> Bool)
     ]
+  , let x :: Combine Int (Sum Int)
+        x = Combine $ \n -> Sum (n - 1)
+        y = Combine $ \n -> Sum (n + 2)
+        z = Combine $ \n -> Sum (n * 3)
+    in QC.testProperty "Semigroup law for Combine" (semigroupAssoc x y z)
   ]
 
 scProps :: TestTree
