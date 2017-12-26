@@ -42,6 +42,7 @@ test-suite haskellbook-solutions-tests
   main-is:             Spec.hs
   build-depends:       base
                      , haskellbook-solutions
+                     , QuickCheck
                      , tasty
                      , tasty-hunit
                      , tasty-quickcheck
