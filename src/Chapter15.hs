@@ -7,7 +7,7 @@ module Chapter15
   ) where
 
 import Data.Semigroup (Semigroup((<>)))
-import Test.QuickCheck (Arbitrary(arbitrary), CoArbitrary, frequency)
+import Test.QuickCheck (Arbitrary(arbitrary), frequency)
 import Test.SmallCheck.Series ((\/), Serial(series), cons0, cons1, newtypeCons)
 
 data Optional a
@@ -46,9 +46,6 @@ instance Arbitrary a => Arbitrary (Optional a) where
 
 instance Arbitrary XOR where
     arbitrary = XOR <$> arbitrary
-
-instance (CoArbitrary a, Arbitrary b) => Arbitrary (Combine a b) where
-    arbitrary = Combine <$> arbitrary
 
 ----------------------------------------------------------------------
 -- Serial instances
