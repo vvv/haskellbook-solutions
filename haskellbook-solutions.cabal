@@ -28,6 +28,7 @@ library
                      , Chapter11
                      , Chapter15
                      , Chapter16
+                     , Chapter20
                      , Cipher
                      , DaPhone
   build-depends:       base >= 4.7 && < 5
