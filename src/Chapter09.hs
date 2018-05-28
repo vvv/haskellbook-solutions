@@ -43,6 +43,9 @@ myZipWith _ [] _ = []
 myZipWith _ _ [] = []
 myZipWith f (x:xs) (y:ys) = f x y : myZipWith f xs ys
 
+myZipW :: [a] -> [b] -> [(a, b)]
+myZipW = myZipWith (,)
+
 myReverse :: [a] -> [a]
 myReverse = go []
   where
