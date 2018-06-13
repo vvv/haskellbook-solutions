@@ -6,7 +6,7 @@ import Data.Char (isUpper, toLower)
 import Data.List (elemIndex, foldl', intersperse)
 import Data.Maybe (catMaybes)
 
-data DaPhone = DaPhone [String]
+newtype DaPhone = DaPhone [String]
   deriving (Eq, Show)
 
 type Digit = Char -- The name is misleading, because '*' and '#' aren't digits.
