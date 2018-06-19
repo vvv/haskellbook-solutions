@@ -42,8 +42,11 @@ test-suite haskellbook-solutions-tests
   type:                exitcode-stdio-1.0
   hs-source-dirs:      test
   main-is:             Spec.hs
+  other-modules:       TestCipher
   build-depends:       base
+                     , QuickCheck
                      , haskellbook-solutions
+                     , hspec
                      , tasty
                      , tasty-hunit
                      , tasty-quickcheck

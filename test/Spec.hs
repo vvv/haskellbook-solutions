@@ -1,5 +1,4 @@
-import Cipher (alphabet, decode, encode)
-import Chapter11
+import           Chapter11
   ( BinaryTree(Leaf,Node)
   , foldTree
   , inorder
@@ -8,14 +7,15 @@ import Chapter11
   , postorder
   , preorder
   )
-import Chapter15 (Combine(..), Optional(Nada,Only), XOR(..))
+import           Chapter15 (Combine(..), Optional(Nada,Only), XOR(..))
+import           TestCipher (testCipher)
 
-import Data.Monoid ((<>), Product(..), Sum(..))
+import           Data.Monoid ((<>), Product(..), Sum(..))
 import           Data.Semigroup (Semigroup)
 import qualified Data.Semigroup as S ((<>))
 
-import Test.Tasty (TestTree, defaultMain, testGroup)
-import Test.Tasty.HUnit ((@?=), Assertion, assertBool, testCase)
+import           Test.Tasty (TestTree, defaultMain, testGroup)
+import           Test.Tasty.HUnit ((@?=), Assertion, testCase)
 import qualified Test.Tasty.QuickCheck as QC (testProperty)
 import qualified Test.Tasty.SmallCheck as SC (testProperty)
 
@@ -70,7 +70,6 @@ unitTests :: TestTree
 unitTests = testGroup "Unit tests"
   [ testCase "Chapter 11" testCh11
   , testCase "Chapter 15" testCh15
-  , testCase "Cipher" testCipher
   ]
 
 testCh11 :: Assertion
@@ -98,9 +97,7 @@ testCh15 = do
     Only (Sum (1 :: Int)) <> Nada @?= Only (Sum 1)
     Nada <> Only [1 :: Int] @?= Only [1]
 
-testCipher :: Assertion
-testCipher = assertBool "codec" $ and [ decode (encode p k) k == p
-                                      | p <- alphabet, k <- alphabet ]
-
 main :: IO ()
-main = defaultMain tests
+main = do
+    testCipher  -- XXX won't be run if placed after `defaultMain`
+    defaultMain tests
