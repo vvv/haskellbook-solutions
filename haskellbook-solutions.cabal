@@ -40,7 +40,7 @@ library
 
 test-suite haskellbook-solutions-tests
   type:                exitcode-stdio-1.0
-  hs-source-dirs:      test
+  hs-source-dirs:      tests
   main-is:             Spec.hs
   other-modules:       TestCipher
   build-depends:       base
@@ -57,7 +57,7 @@ test-suite haskellbook-solutions-tests
 
 test-suite haskellbook-solutions-doctest
   type:               exitcode-stdio-1.0
-  hs-source-dirs:     test
+  hs-source-dirs:     tests
   main-is:            doctest-driver.hs
   build-depends:      base, doctest, doctest-discover
   ghc-options:        -threaded
