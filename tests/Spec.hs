@@ -8,12 +8,14 @@ import           Chapter11
   , preorder
   )
 import           Chapter15 (Combine(..), Optional(Nada,Only), XOR(..))
+import           Chapter16 (GoatLord)
 import           TestCipher (testCipher)
 
 import           Data.Monoid ((<>), Product(..), Sum(..))
 import           Data.Semigroup (Semigroup)
 import qualified Data.Semigroup as S ((<>))
 
+import           Test.QuickCheck.Function (Fun(..))
 import           Test.Tasty (TestTree, defaultMain, testGroup)
 import           Test.Tasty.HUnit ((@?=), Assertion, testCase)
 import qualified Test.Tasty.QuickCheck as QC (testProperty)
@@ -40,7 +42,14 @@ semigroupAssoc x y z a = (x S.<> (y S.<> z)) ==? ((x S.<> y) S.<> z)
   where
     f ==? g = unCombine f a == unCombine g a
 
+functorIdentity :: (Functor f, Eq (f a)) => f a -> Bool
+functorIdentity f = fmap id f == f
+
+functorCompose :: (Functor f, Eq (f c)) => Fun b c -> Fun a b -> f a -> Bool
+functorCompose (Fun _ f) (Fun _ g) x = fmap f (fmap g x) == fmap (f . g) x
+
 type S = Optional (Sum Int)
+type GL = GoatLord Int
 
 qcProps :: TestTree
 qcProps = testGroup "(checked with QuickCheck)"
@@ -54,6 +63,11 @@ qcProps = testGroup "(checked with QuickCheck)"
         y = Combine $ \n -> Sum (n + 2)
         z = Combine $ \n -> Sum (n * 3)
     in QC.testProperty "Semigroup law for Combine" (semigroupAssoc x y z)
+  , testGroup "Functor laws for GoatLord"
+    [ QC.testProperty "fmap id == id" (functorIdentity :: GL -> Bool)
+    , QC.testProperty "fmap (f . g) == (fmap f) . (fmap g)"
+        (functorCompose :: Fun Int Int -> Fun Int Int -> GL -> Bool)
+    ]
   ]
 
 scProps :: TestTree
