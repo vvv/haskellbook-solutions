@@ -1,5 +1,6 @@
 module Chapter16
   ( GoatLord(NoGoat,OneGoat,MoreGoats)
+  , TalkToMe(Halt,Print,Read)
   , e_ch16
   ) where
 
@@ -23,6 +24,16 @@ instance Arbitrary a => Arbitrary (GoatLord a) where
       , OneGoat <$> arbitrary
       , liftA3 (\x y z -> MoreGoats x y z) arbitrary arbitrary arbitrary
       ]
+
+data TalkToMe a
+  = Halt
+  | Print String a
+  | Read (String -> a)
+
+instance Functor TalkToMe where
+    fmap _ Halt = Halt
+    fmap f (Print s a) = Print s (f a)
+    fmap f (Read g) = Read (f . g)
 
 e_ch16 :: IO Integer
 e_ch16 = let ioi = readIO "1" :: IO Integer
